@@ -267,3 +267,5 @@ class Serial(SerialBase):
                     self._read_buffer.put(bytes((value,)))
         finally:
             self._thread = None
+            if self.is_open:
+                self._read_buffer.put(None)

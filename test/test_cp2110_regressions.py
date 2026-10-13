@@ -94,3 +94,34 @@ def test_cp2110_short_hid_write(backend):
     finally:
         port.close()
 
+
+
+def test_cp2110_failed_reader_wakes_pending_read(backend):
+    import threading
+    port = backend.Serial()
+    port.is_open = True
+    port._read_buffer = queue.Queue()
+    port._hid_handle = mock.Mock()
+    port._hid_handle.read.side_effect = OSError('disconnected')
+    port._thread = mock.Mock()
+    waiting = threading.Event()
+    original_get = port._read_buffer.get
+    def get(*args, **kwargs):
+        waiting.set()
+        return original_get(*args, **kwargs)
+    port._read_buffer.get = get
+    result = []
+    reader = threading.Thread(target=lambda: result.append(port.read(1)), daemon=True)
+    reader.start()
+    assert waiting.wait(1)
+    try:
+        with pytest.raises(OSError):
+            port._hid_read_loop()
+        reader.join(1)
+        assert not reader.is_alive()
+        assert result == [b'']
+    finally:
+        port._read_buffer.put(None)
+        reader.join(1)
+        port.close()
+
