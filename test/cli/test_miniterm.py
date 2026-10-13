@@ -24,3 +24,15 @@ def test_eof_cancels_port_change():
     with mock.patch.object(miniterm, 'ask_for_port', side_effect=EOFError):
         terminal.change_port()
     terminal.serial.close.assert_not_called()
+
+
+def test_unsupported_url_keeps_existing_port():
+    terminal = object.__new__(miniterm.Miniterm)
+    terminal.console = mock.MagicMock()
+    terminal.serial = mock.Mock()
+    terminal._stop_reader = mock.Mock()
+    terminal._start_reader = mock.Mock()
+    with mock.patch.object(miniterm, 'ask_for_port', return_value='unsupported://'):
+        terminal.change_port()
+    terminal.serial.close.assert_not_called()
+    terminal._start_reader.assert_called_once_with()

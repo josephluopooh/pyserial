@@ -727,6 +727,7 @@ class Miniterm(object):
             self._stop_reader()
             # save settings
             settings = self.serial.get_settings()
+            new_serial = None
             try:
                 new_serial = serial.serial_for_url(port, do_not_open=True)
                 # restore settings and open
@@ -737,7 +738,8 @@ class Miniterm(object):
                 new_serial.break_condition = self.serial.break_condition
             except Exception as e:
                 sys.stderr.write('--- ERROR opening new port: {} ---\n'.format(e))
-                new_serial.close()
+                if new_serial is not None:
+                    new_serial.close()
             else:
                 self.serial.close()
                 self.serial = new_serial
