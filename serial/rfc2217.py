@@ -61,6 +61,7 @@
 from __future__ import absolute_import
 
 import logging
+import math
 import socket
 import struct
 import threading
@@ -576,7 +577,10 @@ class Serial(SerialBase):
                 elif option == 'poll_modem':
                     self._poll_modem_state = True
                 elif option == 'timeout':
-                    self._network_timeout = float(values[0])
+                    network_timeout = float(values[0])
+                    if not math.isfinite(network_timeout) or network_timeout <= 0:
+                        raise ValueError('timeout must be a finite positive number')
+                    self._network_timeout = network_timeout
                 else:
                     raise ValueError('unknown option: {!r}'.format(option))
             if not parts.hostname or parts.port is None:
@@ -729,10 +733,9 @@ class Serial(SerialBase):
         """Change timeout setting."""
         if timeout is not None:
             try:
-                timeout + 1     # test if it's a number, will throw a TypeError if not...
+                if not math.isfinite(timeout) or timeout < 0:
+                    raise ValueError("Not a valid timeout: {!r}".format(timeout))
             except TypeError:
-                raise ValueError("Not a valid timeout: {!r}".format(timeout))
-            if timeout < 0:
                 raise ValueError("Not a valid timeout: {!r}".format(timeout))
         self._timeout = timeout
 

@@ -91,3 +91,19 @@ def test_timeout_restart_zero_updates_flags():
     assert not timeout.is_non_blocking
     assert not timeout.is_infinite
 
+
+
+@pytest.mark.parametrize('value', [float('nan'), float('inf'), -1, 1j])
+def test_rfc2217_read_timeout_validation(value):
+    from serial.rfc2217 import Serial
+    port = Serial()
+    with pytest.raises(ValueError):
+        port.timeout = value
+
+
+@pytest.mark.parametrize('value', ['nan', 'inf', '-1', '0'])
+def test_rfc2217_network_timeout_validation(value):
+    from serial.rfc2217 import Serial
+    with pytest.raises(serial.SerialException):
+        Serial().from_url('rfc2217://localhost:1234?timeout=' + value)
+
