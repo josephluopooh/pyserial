@@ -59,3 +59,11 @@ def test_spy_direct_initialization():
     assert isinstance(port.formatter, protocol_spy.FormatHexdump)
     assert port.show_all is True
 
+
+
+def test_spy_clear_port():
+    port = serial.serial_for_url('spy:///dev/test', do_not_open=True)
+    port.port = None
+    assert port.port is None
+    assert port.name is None
+

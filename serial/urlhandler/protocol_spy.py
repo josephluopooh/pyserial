@@ -207,8 +207,7 @@ class Serial(serial.Serial):
 
     @serial.Serial.port.setter
     def port(self, value):
-        if value is not None:
-            serial.Serial.port.__set__(self, self.from_url(value))
+        serial.Serial.port.__set__(self, self.from_url(value) if value is not None else None)
 
     def from_url(self, url):
         """extract host and port from an URL string"""
