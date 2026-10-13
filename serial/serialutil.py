@@ -538,15 +538,12 @@ class SerialBase(io.RawIOBase):
         return False
 
     def readinto(self, b):
-        data = self.read(len(b))
+        view = memoryview(b).cast('B')
+        if view.readonly:
+            raise TypeError('readinto() requires a writable buffer')
+        data = self.read(len(view))
         n = len(data)
-        try:
-            b[:n] = data
-        except TypeError as err:
-            import array
-            if not isinstance(b, array.array):
-                raise err
-            b[:n] = array.array('b', data)
+        view[:n] = data
         return n
 
     def close(self):

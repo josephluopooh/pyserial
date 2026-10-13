@@ -49,3 +49,24 @@ def test_hwgrep_missing_selection_value():
     with pytest.raises(ValueError, match='positive integer'):
         protocol_hwgrep.Serial().from_url('hwgrep://test&n')
 
+
+
+@pytest.mark.parametrize('typecode', ['B', 'b', 'H', 'I'])
+def test_readinto_typed_arrays(typecode):
+    import array
+    target = array.array(typecode, [0, 0])
+    view = memoryview(target).cast('B')
+    data = bytes(range(1, view.nbytes + 1))
+    with serial.serial_for_url('loop://', timeout=0) as port:
+        port.write(data)
+        assert port.readinto(target) == len(data)
+    assert bytes(view) == data
+
+
+def test_readinto_rejects_readonly_before_consuming_data():
+    with serial.serial_for_url('loop://', timeout=0) as port:
+        port.write(b'abc')
+        with pytest.raises(TypeError):
+            port.readinto(b'...')
+        assert port.read(3) == b'abc'
+
