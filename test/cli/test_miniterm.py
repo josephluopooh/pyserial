@@ -81,3 +81,17 @@ def test_invalid_encoding_preserves_current_codec(direction):
         setter('not-a-real-encoding')
     assert getattr(terminal, field) == old
 
+
+
+def test_upload_retries_partial_writes(tmp_path):
+    import io
+    filename = tmp_path / 'upload.bin'
+    filename.write_bytes(b'abcdef')
+    terminal = object.__new__(miniterm.Miniterm)
+    terminal.console = mock.MagicMock()
+    terminal.serial = mock.Mock()
+    terminal.serial.write.side_effect = [2, 4]
+    with mock.patch.object(miniterm.sys, 'stdin', io.StringIO(str(filename) + '\n')):
+        terminal.upload_file()
+    assert terminal.serial.write.call_args_list == [mock.call(b'abcdef'), mock.call(b'cdef')]
+

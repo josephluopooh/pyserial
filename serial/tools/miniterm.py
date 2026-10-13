@@ -663,7 +663,11 @@ class Miniterm(object):
                             block = f.read(1024)
                             if not block:
                                 break
-                            self.serial.write(block)
+                            while block:
+                                written = self.serial.write(block)
+                                if not written:
+                                    raise serial.SerialTimeoutException('No progress writing file')
+                                block = block[written:]
                             # Wait for output buffer to drain.
                             self.serial.flush()
                             sys.stderr.write('.')   # Progress indicator.
