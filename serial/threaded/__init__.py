@@ -187,13 +187,14 @@ class ReaderThread(threading.Thread):
         """Reader loop"""
         if not hasattr(self.serial, 'cancel_read'):
             self.serial.timeout = 1
-        self.protocol = self.protocol_factory()
         try:
+            self.protocol = self.protocol_factory()
             self.protocol.connection_made(self)
         except Exception as e:
             self.alive = False
-            self.protocol.connection_lost(e)
             self._connection_made.set()
+            if self.protocol is not None:
+                self.protocol.connection_lost(e)
             return
         error = None
         self._connection_made.set()

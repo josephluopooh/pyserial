@@ -100,3 +100,20 @@ def test_frame_stop_outside_packet():
     protocol.handle_packet.assert_called_once_with(b'ok')
     assert protocol.handle_out_of_packet_data.call_args_list == [mock.call(b')'), mock.call(b')')]
 
+
+
+@pytest.mark.parametrize('factory_error', [False, True])
+def test_reader_initialization_error_signals_waiters(factory_error):
+    from serial.threaded import ReaderThread
+    protocol = mock.Mock()
+    protocol.connection_made.side_effect = ValueError('initialize')
+    protocol.connection_lost.side_effect = ValueError('cleanup')
+    factory = mock.Mock(side_effect=ValueError('factory')) if factory_error else lambda: protocol
+    reader = ReaderThread(mock.Mock(), factory)
+    try:
+        reader.run()
+    except ValueError:
+        pass
+    assert not reader.alive
+    assert reader._connection_made.is_set()
+
