@@ -190,8 +190,12 @@ class Serial(SerialBase):
             if self._cancel_write:
                 return 0  # XXX
             raise SerialTimeoutException('Write timeout')
-        for byte in iterbytes(data):
-            self.queue.put(byte, timeout=self._write_timeout)
+        timeout = Timeout(self._write_timeout)
+        try:
+            for byte in iterbytes(data):
+                self.queue.put(byte, timeout=timeout.time_left())
+        except queue.Full:
+            raise SerialTimeoutException('Write timeout')
         return len(data)
 
     def reset_input_buffer(self):

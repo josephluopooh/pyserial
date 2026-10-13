@@ -4,6 +4,7 @@ import queue
 from unittest import mock
 
 import serial
+import pytest
 from serial.urlhandler import protocol_loop
 
 
@@ -25,3 +26,12 @@ def test_read_uses_remaining_timeout():
                 mock.patch('serial.serialutil.time.monotonic', side_effect=lambda: now[0]):
             assert port.read(2) == b'a'
         assert calls == [1.0, 0.25]
+
+
+def test_full_loop_buffer_raises_serial_timeout():
+    port = protocol_loop.Serial(None, baudrate=115200, write_timeout=0.01)
+    port.port = 'loop://'
+    port.buffer_size = 1
+    with port:
+        with pytest.raises(serial.SerialTimeoutException):
+            port.write(b'ab')
