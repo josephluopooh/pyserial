@@ -114,7 +114,7 @@ class Serial(SerialBase):
                     self.logger.debug('enabled logging')
                 else:
                     raise ValueError('unknown option: {!r}'.format(option))
-        except ValueError as e:
+        except (ValueError, KeyError) as e:
             raise SerialException(
                 'expected a string in the form '
                 '"loop://[?logging={{debug|info|warning|error}}]": {}'.format(e))

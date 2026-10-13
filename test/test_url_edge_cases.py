@@ -144,3 +144,13 @@ def test_network_url_requires_endpoint(scheme, endpoint):
     with pytest.raises(serial.SerialException):
         handler.Serial().from_url(scheme + '://' + endpoint)
 
+
+
+@pytest.mark.parametrize('scheme', ['loop', 'socket', 'rfc2217'])
+def test_invalid_url_logging_level(scheme):
+    from serial.urlhandler import protocol_loop, protocol_socket
+    from serial import rfc2217
+    handler = {'loop': protocol_loop, 'socket': protocol_socket, 'rfc2217': rfc2217}[scheme]
+    with pytest.raises(serial.SerialException):
+        handler.Serial().from_url(scheme + '://localhost:1234?logging=invalid')
+
