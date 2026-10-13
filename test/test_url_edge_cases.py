@@ -154,3 +154,11 @@ def test_invalid_url_logging_level(scheme):
     with pytest.raises(serial.SerialException):
         handler.Serial().from_url(scheme + '://localhost:1234?logging=invalid')
 
+
+
+def test_spy_all_option_does_not_leak_between_ports():
+    port = serial.serial_for_url('spy:///dev/test?all', do_not_open=True)
+    assert port.show_all
+    port.port = 'spy:///dev/other'
+    assert not port.show_all
+

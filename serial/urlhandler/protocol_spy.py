@@ -219,6 +219,7 @@ class Serial(serial.Serial):
                 'not starting with spy:// ({!r})'.format(parts.scheme))
         # process options now, directly altering self
         formatter = FormatHexdump
+        self.show_all = False
         color = False
         output = sys.stderr
         try:
