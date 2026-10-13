@@ -5,6 +5,7 @@ import pytest
 
 from serial.tools import list_ports_common
 
+
 na_attributes = {
     "description",
     "hwid",
@@ -135,7 +136,7 @@ def test_usb_info(symlink, vid, pid, serial_number, location, expected):
     (
         pytest.param(None, None, ..., id="name-fallback"),
         pytest.param("Product", None, "Product", id="product-only"),
-        pytest.param(None, "Interface", "None - Interface", id="interface-only"),
+        pytest.param(None, "Interface", "Interface", id="interface-only"),
         pytest.param("Product", "Interface", "Product - Interface", id="both"),
     ),
 )

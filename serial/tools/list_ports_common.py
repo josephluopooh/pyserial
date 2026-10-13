@@ -54,6 +54,8 @@ class ListPortInfo:
     def usb_description(self) -> str:
         """return a short string to name the port based on USB info"""
         if self.interface is not None:
+            if self.product is None:
+                return self.interface
             return f'{self.product} - {self.interface}'
         elif self.product is not None:
             return self.product
