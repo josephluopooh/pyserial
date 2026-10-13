@@ -60,8 +60,8 @@ class Serial(serial.Serial):
             if option == 'n':
                 # pick n'th element
                 n = int(value) - 1
-                if n < 1:
-                    raise ValueError('option "n" expects a positive integer larger than 1: {!r}'.format(value))
+                if n < 0:
+                    raise ValueError('option "n" expects a positive integer: {!r}'.format(value))
             elif option == 'skip_busy':
                 # open to test if port is available. not the nicest way..
                 test_open = True
