@@ -199,4 +199,3 @@ def test_rfc2217_switch_flow_control(software):
     manager._telnet_process_subnegotiation(rfc.COM_PORT_OPTION + rfc.SET_CONTROL + mode)
     assert port.xonxoff is software
     assert port.rtscts is not software
-

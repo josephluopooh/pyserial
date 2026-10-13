@@ -990,6 +990,9 @@ def main(default_port=None, default_baudrate=9600, default_rts=None, default_dtr
                 for k, v in sorted(TRANSFORMATIONS.items())))
             sys.stderr.write('\n')
             sys.exit(1)
+        for name in args.filter:
+            if name not in TRANSFORMATIONS:
+                parser.error('unknown filter: {!r}'.format(name))
         filters = args.filter
     else:
         filters = ['default']

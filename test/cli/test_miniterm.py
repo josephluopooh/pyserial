@@ -95,3 +95,12 @@ def test_upload_retries_partial_writes(tmp_path):
         terminal.upload_file()
     assert terminal.serial.write.call_args_list == [mock.call(b'abcdef'), mock.call(b'cdef')]
 
+
+
+def test_unknown_filter_fails_before_opening_port():
+    with mock.patch.object(miniterm.sys, 'argv', ['miniterm', 'loop://', '--filter', 'missing-filter']), \
+            mock.patch.object(miniterm.serial, 'serial_for_url') as open_port:
+        with pytest.raises(SystemExit) as error:
+            miniterm.main()
+    assert error.value.code == 2
+    open_port.assert_not_called()

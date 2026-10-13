@@ -124,4 +124,3 @@ def test_cp2110_failed_reader_wakes_pending_read(backend):
         port._read_buffer.put(None)
         reader.join(1)
         port.close()
-
