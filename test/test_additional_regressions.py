@@ -43,3 +43,9 @@ def test_hexlify_incremental_whitespace(space):
     with pytest.raises(UnicodeError):
         encoder.encode('4' + space)
 
+
+
+def test_hwgrep_missing_selection_value():
+    with pytest.raises(ValueError, match='positive integer'):
+        protocol_hwgrep.Serial().from_url('hwgrep://test&n')
+

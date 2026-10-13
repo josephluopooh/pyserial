@@ -59,7 +59,10 @@ class Serial(serial.Serial):
                 value = None
             if option == 'n':
                 # pick n'th element
-                n = int(value) - 1
+                try:
+                    n = int(value) - 1
+                except (TypeError, ValueError):
+                    raise ValueError('option "n" expects a positive integer: {!r}'.format(value))
                 if n < 0:
                     raise ValueError('option "n" expects a positive integer: {!r}'.format(value))
             elif option == 'skip_busy':
