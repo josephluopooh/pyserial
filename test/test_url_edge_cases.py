@@ -38,3 +38,16 @@ def test_hexlify_empty_decoder_chunks():
     assert decoder.decode(b'A') == '41 '
     assert decoder.decode(b'', final=True) == ''
 
+
+
+def test_hexlify_incomplete_final_pair():
+    encoder = hexlify_codec.IncrementalEncoder()
+    assert encoder.encode('4') == b''
+    with pytest.raises(UnicodeError, match='odd number'):
+        encoder.encode('', final=True)
+    encoder.reset()
+    assert encoder.encode('41', final=True) == b'A'
+    ignoring = hexlify_codec.IncrementalEncoder(errors='ignore')
+    assert ignoring.encode('4', final=True) == b''
+    assert ignoring.getstate() == 0
+

@@ -85,6 +85,10 @@ class IncrementalEncoder(codecs.IncrementalEncoder):
             else:
                 if self.errors == "strict":
                     raise UnicodeError(f"non-hex digit found: {c!r}")
+        if final and state:
+            if self.errors == "strict":
+                raise UnicodeError("odd number of hex digits")
+            state = 0
         self.setstate(state)
         return bytes(encoded)
 
