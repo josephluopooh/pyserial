@@ -468,13 +468,15 @@ class Miniterm(object):
 
     def set_rx_encoding(self, encoding, errors='replace'):
         """set encoding for received data"""
+        decoder = codecs.getincrementaldecoder(encoding)(errors)
+        self.rx_decoder = decoder
         self.input_encoding = encoding
-        self.rx_decoder = codecs.getincrementaldecoder(encoding)(errors)
 
     def set_tx_encoding(self, encoding, errors='replace'):
         """set encoding for transmitted data"""
+        encoder = codecs.getincrementalencoder(encoding)(errors)
+        self.tx_encoder = encoder
         self.output_encoding = encoding
-        self.tx_encoder = codecs.getincrementalencoder(encoding)(errors)
 
     def dump_port_settings(self):
         """Write current settings to sys.stderr"""

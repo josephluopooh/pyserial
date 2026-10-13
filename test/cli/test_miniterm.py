@@ -68,3 +68,16 @@ def test_writer_console_eof():
     assert not terminal.alive
     terminal.serial.write.assert_not_called()
 
+
+
+@pytest.mark.parametrize('direction', ['rx', 'tx'])
+def test_invalid_encoding_preserves_current_codec(direction):
+    terminal = object.__new__(miniterm.Miniterm)
+    setter = getattr(terminal, 'set_' + direction + '_encoding')
+    setter('utf-8')
+    field = 'input_encoding' if direction == 'rx' else 'output_encoding'
+    old = getattr(terminal, field)
+    with pytest.raises(LookupError):
+        setter('not-a-real-encoding')
+    assert getattr(terminal, field) == old
+
