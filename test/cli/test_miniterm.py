@@ -51,3 +51,20 @@ def test_exit_while_port_suspended():
     terminal.stop.assert_called_once_with()
     terminal._start_reader.assert_not_called()
 
+
+
+def test_writer_console_eof():
+    terminal = object.__new__(miniterm.Miniterm)
+    terminal.alive = True
+    terminal.console = mock.Mock()
+    terminal.console.getkey.side_effect = ['', AssertionError('read beyond EOF')]
+    terminal.serial = mock.Mock()
+    terminal.menu_character = '\x14'
+    terminal.exit_character = '\x1d'
+    terminal.tx_transformations = []
+    terminal.tx_encoder = mock.Mock()
+    terminal.echo = False
+    terminal.writer()
+    assert not terminal.alive
+    terminal.serial.write.assert_not_called()
+

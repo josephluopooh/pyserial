@@ -535,6 +535,9 @@ class Miniterm(object):
                     c = '\x03'
                 if not self.alive:
                     break
+                if not c:
+                    self.stop()
+                    break
                 if menu_active:
                     self.handle_menu_key(c)
                     menu_active = False
@@ -761,7 +764,7 @@ class Miniterm(object):
             sys.stderr.write('--- Quit: {exit} | p: port change | any other key to reconnect ---\n'.format(
                 exit=key_description(self.exit_character)))
             k = self.console.getkey()
-            if k == self.exit_character:
+            if not k or k == self.exit_character:
                 self.stop()             # exit app
                 break
             elif k in 'pP':
