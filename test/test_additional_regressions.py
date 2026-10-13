@@ -70,3 +70,12 @@ def test_readinto_rejects_readonly_before_consuming_data():
             port.readinto(b'...')
         assert port.read(3) == b'abc'
 
+
+
+def test_send_break_restores_idle_after_interruption():
+    with serial.serial_for_url('loop://') as port:
+        with mock.patch('serial.serialutil.time.sleep', side_effect=KeyboardInterrupt):
+            with pytest.raises(KeyboardInterrupt):
+                port.send_break()
+        assert port.break_condition is False
+

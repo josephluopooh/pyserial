@@ -577,8 +577,10 @@ class SerialBase(io.RawIOBase):
         if not self.is_open:
             raise PortNotOpenError()
         self.break_condition = True
-        time.sleep(duration)
-        self.break_condition = False
+        try:
+            time.sleep(duration)
+        finally:
+            self.break_condition = False
 
     #  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
     # backwards compatibility / deprecated functions
