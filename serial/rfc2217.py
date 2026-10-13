@@ -620,7 +620,7 @@ class Serial(SerialBase):
                 if buf is None:
                     return bytes(data)
                 data += buf
-                if timeout.expired():
+                if not timeout.is_non_blocking and timeout.expired():
                     break
         except Queue.Empty:  # -> timeout
             pass

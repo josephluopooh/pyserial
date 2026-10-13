@@ -107,3 +107,20 @@ def test_rfc2217_network_timeout_validation(value):
     with pytest.raises(serial.SerialException):
         Serial().from_url('rfc2217://localhost:1234?timeout=' + value)
 
+
+
+def test_rfc2217_nonblocking_read_drains_queue():
+    import queue
+    from serial.rfc2217 import Serial
+    port = Serial(timeout=0)
+    port.is_open = True
+    port._read_buffer = queue.Queue()
+    for value in (b'a', b'b', b'c'):
+        port._read_buffer.put(value)
+    port._thread = mock.Mock()
+    try:
+        assert port.read(10) == b'abc'
+    finally:
+        port._thread = None
+        port.close()
+
