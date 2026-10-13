@@ -22,3 +22,9 @@ def test_hwgrep_uppercase_scheme():
         port = serial.serial_for_url('HWGREP://test', do_not_open=True)
         assert port.port == '/dev/test'
 
+
+
+def test_alt_non_class():
+    with pytest.raises(ValueError, match='not an instance of Serial'):
+        protocol_alt.serial_class_for_url('alt:///dev/test?class=VERSION')
+

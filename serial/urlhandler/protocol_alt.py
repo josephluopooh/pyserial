@@ -47,7 +47,7 @@ def serial_class_for_url(url):
     if not hasattr(serial, class_name):
         raise ValueError('unknown class: {!r}'.format(class_name))
     cls = getattr(serial, class_name)
-    if not issubclass(cls, serial.Serial):
+    if not isinstance(cls, type) or not issubclass(cls, serial.Serial):
         raise ValueError('class {!r} is not an instance of Serial'.format(class_name))
     return (''.join([parts.netloc, parts.path]), cls)
 
