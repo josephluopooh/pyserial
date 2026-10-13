@@ -46,11 +46,17 @@ class SysFS(list_ports_common.ListPortInfo):
 
             try:
                 num_if = int(self.read_line(self.usb_device_path, 'bNumInterfaces'))
-            except ValueError:
+            except (TypeError, ValueError):
                 num_if = 1
 
-            self.vid = int(self.read_line(self.usb_device_path, 'idVendor'), 16)
-            self.pid = int(self.read_line(self.usb_device_path, 'idProduct'), 16)
+            try:
+                self.vid = int(self.read_line(self.usb_device_path, 'idVendor'), 16)
+            except (TypeError, ValueError):
+                pass
+            try:
+                self.pid = int(self.read_line(self.usb_device_path, 'idProduct'), 16)
+            except (TypeError, ValueError):
+                pass
             self.serial_number = self.read_line(self.usb_device_path, 'serial')
             if num_if > 1:  # multi interface devices like FT4232
                 self.location = os.path.basename(self.usb_interface_path)
