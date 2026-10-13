@@ -89,3 +89,14 @@ def test_packetizer_reconnect_discards_partial_packet():
     protocol.data_received(b'new\x00')
     protocol.handle_packet.assert_called_once_with(bytearray(b'new'))
 
+
+
+def test_frame_stop_outside_packet():
+    from serial.threaded import FramedPacket
+    protocol = FramedPacket()
+    protocol.handle_packet = mock.Mock()
+    protocol.handle_out_of_packet_data = mock.Mock()
+    protocol.data_received(b')(ok))')
+    protocol.handle_packet.assert_called_once_with(b'ok')
+    assert protocol.handle_out_of_packet_data.call_args_list == [mock.call(b')'), mock.call(b')')]
+

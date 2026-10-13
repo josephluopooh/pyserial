@@ -103,7 +103,7 @@ class FramedPacket(Protocol):
         for byte in serial.iterbytes(data):
             if byte == self.START:
                 self.in_packet = True
-            elif byte == self.STOP:
+            elif byte == self.STOP and self.in_packet:
                 self.in_packet = False
                 self.handle_packet(bytes(self.packet)) # make read-only copy
                 del self.packet[:]
