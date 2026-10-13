@@ -58,3 +58,26 @@ def test_cp2110_write_count(backend, length):
     finally:
         port.close()
 
+
+
+def test_cp2110_read_size_and_waiting_bytes(backend):
+    port = backend.Serial(timeout=0)
+    port.is_open = True
+    port._read_buffer = queue.Queue()
+    port._hid_handle = mock.Mock()
+    def receive(*args, **kwargs):
+        port.is_open = False
+        return [3, 65, 66, 67]
+    port._hid_handle.read.side_effect = receive
+    port._hid_read_loop()
+    port.is_open = True
+    port._thread = mock.Mock()
+    try:
+        assert port.in_waiting == 3
+        assert port.read(2) == b'AB'
+        assert port.in_waiting == 1
+        assert port.read(5) == b'C'
+    finally:
+        port._thread = None
+        port.close()
+

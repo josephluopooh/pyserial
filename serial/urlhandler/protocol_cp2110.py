@@ -233,7 +233,7 @@ class Serial(SerialBase):
                 if buf is None:
                     return bytes(data)
                 data += buf
-                if timeout.expired():
+                if not timeout.is_non_blocking and timeout.expired():
                     break
         except Queue.Empty:  # -> timeout
             pass
@@ -262,6 +262,7 @@ class Serial(SerialBase):
                     continue
                 data_len = data.pop(0)
                 assert data_len == len(data)
-                self._read_buffer.put(bytearray(data))
+                for value in data:
+                    self._read_buffer.put(bytes((value,)))
         finally:
             self._thread = None
