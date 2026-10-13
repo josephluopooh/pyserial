@@ -79,3 +79,15 @@ def test_send_break_restores_idle_after_interruption():
                 port.send_break()
         assert port.break_condition is False
 
+
+
+def test_timeout_restart_zero_updates_flags():
+    from serial.serialutil import Timeout
+    timeout = Timeout(1)
+    timeout.restart(0)
+    assert timeout.is_non_blocking
+    assert timeout.expired()
+    timeout.restart(1)
+    assert not timeout.is_non_blocking
+    assert not timeout.is_infinite
+

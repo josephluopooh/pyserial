@@ -150,6 +150,8 @@ class Timeout:
         """
 
         self._duration = duration
+        self.is_non_blocking = duration == 0
+        self.is_infinite = False
         self._target_time = time.monotonic() + duration
 
 
