@@ -162,3 +162,17 @@ def test_spy_all_option_does_not_leak_between_ports():
     port.port = 'spy:///dev/other'
     assert not port.show_all
 
+
+
+def test_socket_close_after_failed_shutdown():
+    from serial.urlhandler import protocol_socket
+    port = protocol_socket.Serial()
+    connection = mock.Mock()
+    connection.shutdown.side_effect = OSError('already disconnected')
+    port._socket = connection
+    port.is_open = True
+    with mock.patch.object(protocol_socket.time, 'sleep'):
+        port.close()
+    connection.close.assert_called_once_with()
+    assert not port.is_open
+    assert port._socket is None

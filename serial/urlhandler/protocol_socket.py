@@ -93,10 +93,13 @@ class Serial(SerialBase):
             if self._socket:
                 try:
                     self._socket.shutdown(socket.SHUT_RDWR)
-                    self._socket.close()
-                except:
-                    # ignore errors.
+                except OSError:
                     pass
+                finally:
+                    try:
+                        self._socket.close()
+                    except OSError:
+                        pass
                 self._socket = None
             self.is_open = False
             # in case of quick reconnects, give the server some time
