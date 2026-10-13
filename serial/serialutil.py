@@ -11,6 +11,7 @@ from __future__ import absolute_import
 
 import io
 import time
+import math
 
 # ``memoryview`` was introduced in Python 2.7 and ``bytes(some_memoryview)``
 # isn't returning the contents (very unfortunate). Therefore we need special
@@ -356,10 +357,9 @@ class SerialBase(io.RawIOBase):
         """Change timeout setting."""
         if timeout is not None:
             try:
-                timeout + 1     # test if it's a number, will throw a TypeError if not...
+                if not math.isfinite(timeout) or timeout < 0:
+                    raise ValueError("Not a valid timeout: {!r}".format(timeout))
             except TypeError:
-                raise ValueError("Not a valid timeout: {!r}".format(timeout))
-            if timeout < 0:
                 raise ValueError("Not a valid timeout: {!r}".format(timeout))
         self._timeout = timeout
         if self.is_open:
@@ -374,10 +374,9 @@ class SerialBase(io.RawIOBase):
     def write_timeout(self, timeout):
         """Change timeout setting."""
         if timeout is not None:
-            if timeout < 0:
-                raise ValueError("Not a valid timeout: {!r}".format(timeout))
             try:
-                timeout + 1     # test if it's a number, will throw a TypeError if not...
+                if not math.isfinite(timeout) or timeout < 0:
+                    raise ValueError("Not a valid timeout: {!r}".format(timeout))
             except TypeError:
                 raise ValueError("Not a valid timeout: {!r}".format(timeout))
 
@@ -394,10 +393,9 @@ class SerialBase(io.RawIOBase):
     def inter_byte_timeout(self, ic_timeout):
         """Change inter-byte timeout setting."""
         if ic_timeout is not None:
-            if ic_timeout < 0:
-                raise ValueError("Not a valid timeout: {!r}".format(ic_timeout))
             try:
-                ic_timeout + 1     # test if it's a number, will throw a TypeError if not...
+                if not math.isfinite(ic_timeout) or ic_timeout < 0:
+                    raise ValueError("Not a valid timeout: {!r}".format(ic_timeout))
             except TypeError:
                 raise ValueError("Not a valid timeout: {!r}".format(ic_timeout))
 

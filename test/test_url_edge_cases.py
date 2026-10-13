@@ -67,3 +67,12 @@ def test_spy_clear_port():
     assert port.port is None
     assert port.name is None
 
+
+
+@pytest.mark.parametrize('setting', ['timeout', 'write_timeout', 'inter_byte_timeout'])
+@pytest.mark.parametrize('value', [float('nan'), float('inf'), -float('inf'), 'bad', complex(1, 1)])
+def test_invalid_timeout_values(setting, value):
+    port = serial.Serial()
+    with pytest.raises(ValueError):
+        setattr(port, setting, value)
+
