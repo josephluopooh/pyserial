@@ -248,7 +248,8 @@ class Serial(SerialBase):
         while tx_len > 0:
             to_be_sent = min(tx_len, 0x3F)
             report = to_bytes([to_be_sent]) + data[:to_be_sent]
-            self._hid_handle.write(report)
+            if self._hid_handle.write(report) != len(report):
+                raise SerialException('short HID write')
 
             data = data[to_be_sent:]
             tx_len = len(data)

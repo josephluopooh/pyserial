@@ -81,3 +81,16 @@ def test_cp2110_read_size_and_waiting_bytes(backend):
         port._thread = None
         port.close()
 
+
+
+def test_cp2110_short_hid_write(backend):
+    port = backend.Serial()
+    port.is_open = True
+    port._hid_handle = mock.Mock()
+    port._hid_handle.write.return_value = 1
+    try:
+        with pytest.raises(serial.SerialException, match='short'):
+            port.write(b'abc')
+    finally:
+        port.close()
+
