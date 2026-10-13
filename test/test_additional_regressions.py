@@ -141,3 +141,16 @@ def test_rfc2217_typed_buffer_write_count():
     finally:
         port.close()
 
+
+
+def test_rfc2217_close_after_shutdown_error():
+    from serial.rfc2217 import Serial
+    port = Serial()
+    sock = mock.Mock()
+    sock.shutdown.side_effect = OSError('disconnected')
+    port._socket = sock
+    port.is_open = True
+    port.close()
+    sock.close.assert_called_once_with()
+    assert port._socket is None
+

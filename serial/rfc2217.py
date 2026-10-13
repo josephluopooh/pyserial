@@ -542,10 +542,11 @@ class Serial(SerialBase):
         if self._socket:
             try:
                 self._socket.shutdown(socket.SHUT_RDWR)
-                self._socket.close()
             except:
                 # ignore errors.
                 pass
+            finally:
+                self._socket.close()
         if self._thread:
             self._thread.join(7)  # XXX more than socket timeout
             self._thread = None
