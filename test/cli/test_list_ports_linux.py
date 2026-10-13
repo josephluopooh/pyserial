@@ -37,3 +37,13 @@ def test_missing_usb_numeric_attributes(fs, usb_device, attribute, value):
         assert info.location == '1-1'
     else:
         assert getattr(info, 'vid' if attribute == 'idVendor' else 'pid') is None
+
+
+def test_symlink_retains_usb_metadata(fs, usb_device):
+    fs.create_symlink('/dev/serial/by-id/example', '/dev/ttyACM0')
+    info = SysFS('/dev/serial/by-id/example')
+    assert info.device == '/dev/serial/by-id/example'
+    assert info.description == 'Test device'
+    assert info.vid == 0x1234
+    assert info.pid == 0x5678
+    assert 'LINK=/dev/ttyACM0' in info.hwid

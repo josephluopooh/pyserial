@@ -27,8 +27,9 @@ class SysFS(list_ports_common.ListPortInfo):
         else:
             is_link = False
         self.usb_device_path = None
-        if os.path.exists('/sys/class/tty/{}/device'.format(self.name)):
-            self.device_path = os.path.realpath('/sys/class/tty/{}/device'.format(self.name))
+        sysfs_name = os.path.basename(device)
+        if os.path.exists('/sys/class/tty/{}/device'.format(sysfs_name)):
+            self.device_path = os.path.realpath('/sys/class/tty/{}/device'.format(sysfs_name))
             self.subsystem = os.path.basename(os.path.realpath(os.path.join(self.device_path, 'subsystem')))
         else:
             self.device_path = None
