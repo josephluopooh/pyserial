@@ -76,3 +76,16 @@ def test_invalid_timeout_values(setting, value):
     with pytest.raises(ValueError):
         setattr(port, setting, value)
 
+
+
+def test_packetizer_reconnect_discards_partial_packet():
+    from serial.threaded import Packetizer
+    protocol = Packetizer()
+    protocol.handle_packet = mock.Mock()
+    protocol.connection_made(mock.Mock())
+    protocol.data_received(b'old')
+    protocol.connection_lost(None)
+    protocol.connection_made(mock.Mock())
+    protocol.data_received(b'new\x00')
+    protocol.handle_packet.assert_called_once_with(bytearray(b'new'))
+

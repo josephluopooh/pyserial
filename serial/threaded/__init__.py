@@ -57,6 +57,7 @@ class Packetizer(Protocol):
     def connection_lost(self, exc):
         """Forget transport"""
         self.transport = None
+        del self.buffer[:]
         super(Packetizer, self).connection_lost(exc)
 
     def data_received(self, data):
