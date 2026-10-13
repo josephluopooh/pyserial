@@ -32,3 +32,14 @@ def test_closed_loopback_dsr():
     finally:
         port.close()
 
+
+
+@pytest.mark.parametrize('space', ['\t', '\n', '\r', '\v', '\f'])
+def test_hexlify_incremental_whitespace(space):
+    text = '41' + space + '42'
+    expected = hexlify_codec.hex_encode(text)[0]
+    encoder = hexlify_codec.IncrementalEncoder()
+    assert b''.join(encoder.encode(c) for c in text) == expected
+    with pytest.raises(UnicodeError):
+        encoder.encode('4' + space)
+

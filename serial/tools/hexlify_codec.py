@@ -78,7 +78,7 @@ class IncrementalEncoder(codecs.IncrementalEncoder):
                     state = 0
                 else:
                     state = 0x100 + (z << 4)
-            elif c == " ":  # allow spaces to separate values
+            elif c in " \t\n\r\v\f":  # match bytes.fromhex whitespace
                 if state and self.errors == "strict":
                     raise UnicodeError("odd number of hex digits")
                 state = 0
