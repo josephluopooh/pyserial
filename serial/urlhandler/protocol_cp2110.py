@@ -243,7 +243,8 @@ class Serial(SerialBase):
         if not self.is_open:
             raise PortNotOpenError()
         data = to_bytes(data)
-        tx_len = len(data)
+        written = len(data)
+        tx_len = written
         while tx_len > 0:
             to_be_sent = min(tx_len, 0x3F)
             report = to_bytes([to_be_sent]) + data[:to_be_sent]
@@ -251,6 +252,7 @@ class Serial(SerialBase):
 
             data = data[to_be_sent:]
             tx_len = len(data)
+        return written
 
     def _hid_read_loop(self):
         try:

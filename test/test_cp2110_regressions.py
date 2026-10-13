@@ -45,3 +45,16 @@ def test_cp2110_closed_input_count(backend):
     with pytest.raises(serial.PortNotOpenError):
         _ = port.in_waiting
 
+
+
+@pytest.mark.parametrize('length', [0, 1, 63, 64, 127])
+def test_cp2110_write_count(backend, length):
+    port = backend.Serial()
+    port.is_open = True
+    port._hid_handle = mock.Mock()
+    port._hid_handle.write.side_effect = len
+    try:
+        assert port.write(b'x' * length) == length
+    finally:
+        port.close()
+
