@@ -720,7 +720,7 @@ class Miniterm(object):
         with self.console:
             try:
                 port = ask_for_port()
-            except KeyboardInterrupt:
+            except (KeyboardInterrupt, EOFError):
                 port = None
         if port and port != self.serial.port:
             # reader thread needs to be shut down
@@ -988,7 +988,7 @@ def main(default_port=None, default_baudrate=9600, default_rts=None, default_dtr
         if args.port is None or args.port == '-':
             try:
                 args.port = ask_for_port()
-            except KeyboardInterrupt:
+            except (KeyboardInterrupt, EOFError):
                 sys.stderr.write('\n')
                 parser.error('user aborted and port is not given')
             else:
