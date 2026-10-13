@@ -1244,11 +1244,13 @@ class PortManager(object):
                         self.logger.info("changed flow control to None")
                     self.rfc2217_send_subnegotiation(SERVER_SET_CONTROL, SET_CONTROL_USE_NO_FLOW_CONTROL)
                 elif suboption[2:3] == SET_CONTROL_USE_SW_FLOW_CONTROL:
+                    self.serial.rtscts = False
                     self.serial.xonxoff = True
                     if self.logger:
                         self.logger.info("changed flow control to XON/XOFF")
                     self.rfc2217_send_subnegotiation(SERVER_SET_CONTROL, SET_CONTROL_USE_SW_FLOW_CONTROL)
                 elif suboption[2:3] == SET_CONTROL_USE_HW_FLOW_CONTROL:
+                    self.serial.xonxoff = False
                     self.serial.rtscts = True
                     if self.logger:
                         self.logger.info("changed flow control to RTS/CTS")

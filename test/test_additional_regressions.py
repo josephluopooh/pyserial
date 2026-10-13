@@ -186,3 +186,17 @@ def test_rfc2217_invalid_setting_requests(command, payload):
     assert port.get_settings() == before
     assert connection.write.called
 
+
+
+@pytest.mark.parametrize('software', [True, False])
+def test_rfc2217_switch_flow_control(software):
+    import serial.rfc2217 as rfc
+    port = serial.Serial()
+    port.xonxoff = not software
+    port.rtscts = software
+    manager = rfc.PortManager(port, mock.Mock())
+    mode = rfc.SET_CONTROL_USE_SW_FLOW_CONTROL if software else rfc.SET_CONTROL_USE_HW_FLOW_CONTROL
+    manager._telnet_process_subnegotiation(rfc.COM_PORT_OPTION + rfc.SET_CONTROL + mode)
+    assert port.xonxoff is software
+    assert port.rtscts is not software
+
