@@ -773,7 +773,7 @@ class Miniterm(object):
                 sys.stderr.write('--- ERROR opening port: {} ---\n'.format(e))
         if do_change_port:
             self.change_port()
-        else:
+        elif self.serial.is_open:
             # and restart the reader thread
             self._start_reader()
             sys.stderr.write('--- Port opened: {} ---\n'.format(self.serial.port))

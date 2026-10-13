@@ -36,3 +36,18 @@ def test_unsupported_url_keeps_existing_port():
         terminal.change_port()
     terminal.serial.close.assert_not_called()
     terminal._start_reader.assert_called_once_with()
+
+
+def test_exit_while_port_suspended():
+    terminal = object.__new__(miniterm.Miniterm)
+    terminal.serial = mock.Mock(is_open=False, port='test')
+    terminal.console = mock.Mock()
+    terminal.exit_character = '\x1d'
+    terminal.console.getkey.return_value = terminal.exit_character
+    terminal._stop_reader = mock.Mock()
+    terminal._start_reader = mock.Mock()
+    terminal.stop = mock.Mock()
+    terminal.suspend_port()
+    terminal.stop.assert_called_once_with()
+    terminal._start_reader.assert_not_called()
+
