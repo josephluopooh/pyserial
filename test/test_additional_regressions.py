@@ -173,3 +173,16 @@ def test_rfc2217_repeated_open_preserves_options():
     finally:
         port.close()
 
+
+
+@pytest.mark.parametrize('command,payload', [(1, b''), (2, b''), (3, b''), (4, b''), (3, b'\xff'), (4, b'\xff')])
+def test_rfc2217_invalid_setting_requests(command, payload):
+    from serial.rfc2217 import PortManager, COM_PORT_OPTION
+    port = serial.Serial()
+    connection = mock.Mock()
+    manager = PortManager(port, connection)
+    before = port.get_settings()
+    manager._telnet_process_subnegotiation(COM_PORT_OPTION + bytes([command]) + payload)
+    assert port.get_settings() == before
+    assert connection.write.called
+

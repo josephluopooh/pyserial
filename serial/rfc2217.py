@@ -1175,7 +1175,7 @@ class PortManager(object):
                     (baudrate,) = struct.unpack(b"!I", suboption[2:6])
                     if baudrate != 0:
                         self.serial.baudrate = baudrate
-                except ValueError as e:
+                except (ValueError, KeyError, struct.error) as e:
                     if self.logger:
                         self.logger.error("failed to set baud rate: {}".format(e))
                     self.serial.baudrate = backup
@@ -1189,7 +1189,7 @@ class PortManager(object):
                     (datasize,) = struct.unpack(b"!B", suboption[2:3])
                     if datasize != 0:
                         self.serial.bytesize = datasize
-                except ValueError as e:
+                except (ValueError, KeyError, struct.error) as e:
                     if self.logger:
                         self.logger.error("failed to set data size: {}".format(e))
                     self.serial.bytesize = backup
@@ -1203,7 +1203,7 @@ class PortManager(object):
                     parity = struct.unpack(b"!B", suboption[2:3])[0]
                     if parity != 0:
                         self.serial.parity = RFC2217_REVERSE_PARITY_MAP[parity]
-                except ValueError as e:
+                except (ValueError, KeyError, struct.error) as e:
                     if self.logger:
                         self.logger.error("failed to set parity: {}".format(e))
                     self.serial.parity = backup
@@ -1219,7 +1219,7 @@ class PortManager(object):
                     stopbits = struct.unpack(b"!B", suboption[2:3])[0]
                     if stopbits != 0:
                         self.serial.stopbits = RFC2217_REVERSE_STOPBIT_MAP[stopbits]
-                except ValueError as e:
+                except (ValueError, KeyError, struct.error) as e:
                     if self.logger:
                         self.logger.error("failed to set stop bits: {}".format(e))
                     self.serial.stopbits = backup
