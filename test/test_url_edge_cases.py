@@ -133,3 +133,14 @@ def test_reader_can_stop_itself():
     assert not reader.is_alive()
     assert errors == [None]
 
+
+
+@pytest.mark.parametrize('scheme', ['socket', 'rfc2217'])
+@pytest.mark.parametrize('endpoint', ['localhost', ':1234'])
+def test_network_url_requires_endpoint(scheme, endpoint):
+    from serial.urlhandler import protocol_socket
+    from serial import rfc2217
+    handler = protocol_socket if scheme == 'socket' else rfc2217
+    with pytest.raises(serial.SerialException):
+        handler.Serial().from_url(scheme + '://' + endpoint)
+

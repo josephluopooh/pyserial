@@ -108,7 +108,7 @@ class Serial(SerialBase):
         if parts.scheme != "socket":
             raise SerialException(
                 'expected a string in the form '
-                '"socket://<host>:<port>[?logging={debug|info|warning|error}]": '
+                '"socket://<host>:<port>[?logging={{debug|info|warning|error}}]": '
                 'not starting with socket:// ({!r})'.format(parts.scheme))
         try:
             # process options now, directly altering self
@@ -120,12 +120,14 @@ class Serial(SerialBase):
                     self.logger.debug('enabled logging')
                 else:
                     raise ValueError('unknown option: {!r}'.format(option))
+            if not parts.hostname or parts.port is None:
+                raise ValueError("host and port are required")
             if not 0 <= parts.port < 65536:
                 raise ValueError("port not in range 0...65535")
         except ValueError as e:
             raise SerialException(
                 'expected a string in the form '
-                '"socket://<host>:<port>[?logging={debug|info|warning|error}]": {}'.format(e))
+                '"socket://<host>:<port>[?logging={{debug|info|warning|error}}]": {}'.format(e))
 
         return (parts.hostname, parts.port)
 

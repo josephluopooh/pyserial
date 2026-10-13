@@ -579,6 +579,8 @@ class Serial(SerialBase):
                     self._network_timeout = float(values[0])
                 else:
                     raise ValueError('unknown option: {!r}'.format(option))
+            if not parts.hostname or parts.port is None:
+                raise ValueError("host and port are required")
             if not 0 <= parts.port < 65536:
                 raise ValueError("port not in range 0...65535")
         except ValueError as e:
