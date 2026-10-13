@@ -67,15 +67,16 @@ class RS485(serial.Serial):
         if self._alternate_rs485_settings is not None:
             # apply level for TX and optional delay
             self.rts = self._alternate_rs485_settings.rts_level_for_tx
-            if self._alternate_rs485_settings.delay_before_tx is not None:
-                time.sleep(self._alternate_rs485_settings.delay_before_tx)
-            # write and wait for data to be written
-            super(RS485, self).write(b)
-            super(RS485, self).flush()
-            # optional delay and apply level for RX
-            if self._alternate_rs485_settings.delay_before_rx is not None:
-                time.sleep(self._alternate_rs485_settings.delay_before_rx)
-            self.rts = self._alternate_rs485_settings.rts_level_for_rx
+            try:
+                if self._alternate_rs485_settings.delay_before_tx is not None:
+                    time.sleep(self._alternate_rs485_settings.delay_before_tx)
+                # write and wait for data to be written
+                super(RS485, self).write(b)
+                super(RS485, self).flush()
+                if self._alternate_rs485_settings.delay_before_rx is not None:
+                    time.sleep(self._alternate_rs485_settings.delay_before_rx)
+            finally:
+                self.rts = self._alternate_rs485_settings.rts_level_for_rx
         else:
             super(RS485, self).write(b)
         return len(b)
