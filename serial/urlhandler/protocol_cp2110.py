@@ -85,6 +85,8 @@ class Serial(SerialBase):
             portpath = self.from_url(self.name)
             self._hid_handle.open_path(portpath)
         except OSError as msg:
+            self._hid_handle.close()
+            self._hid_handle = None
             raise SerialException(msg.errno, "could not open port {}: {}".format(self._port, msg))
 
         try:
@@ -119,8 +121,11 @@ class Serial(SerialBase):
         if self._thread:
             self._thread.join(1)  # read timeout is 0.1
             self._thread = None
-        self._hid_handle.close()
-        self._hid_handle = None
+        if self._hid_handle is not None:
+            try:
+                self._hid_handle.close()
+            finally:
+                self._hid_handle = None
 
     def _reconfigure_port(self):
         parity_value = None
