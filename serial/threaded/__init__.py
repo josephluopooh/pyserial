@@ -181,7 +181,8 @@ class ReaderThread(threading.Thread):
         self.alive = False
         if hasattr(self.serial, 'cancel_read'):
             self.serial.cancel_read()
-        self.join(2)
+        if threading.current_thread() is not self:
+            self.join(2)
 
     def run(self):
         """Reader loop"""

@@ -117,3 +117,19 @@ def test_reader_initialization_error_signals_waiters(factory_error):
     assert not reader.alive
     assert reader._connection_made.is_set()
 
+
+
+def test_reader_can_stop_itself():
+    from serial.threaded import ReaderThread, Protocol
+    class StopProtocol(Protocol):
+        def connection_made(self, transport):
+            transport.stop()
+        def connection_lost(self, error):
+            errors.append(error)
+    errors = []
+    reader = ReaderThread(mock.Mock(), StopProtocol)
+    reader.start()
+    reader.join(2)
+    assert not reader.is_alive()
+    assert errors == [None]
+
