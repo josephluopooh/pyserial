@@ -38,7 +38,7 @@ class Serial(serial.Serial):
     @serial.Serial.port.setter
     def port(self, value):
         """translate port name before storing it"""
-        if isinstance(value, basestring) and value.startswith('hwgrep://'):
+        if isinstance(value, basestring) and value.lower().startswith('hwgrep://'):
             serial.Serial.port.__set__(self, self.from_url(value))
         else:
             serial.Serial.port.__set__(self, value)

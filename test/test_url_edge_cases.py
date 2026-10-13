@@ -15,3 +15,10 @@ def test_hwgrep_first_port():
         with pytest.raises(ValueError):
             protocol_hwgrep.Serial().from_url('hwgrep://test&n=' + value)
 
+
+
+def test_hwgrep_uppercase_scheme():
+    with mock.patch('serial.tools.list_ports.grep', return_value=[('/dev/test', '', '')]):
+        port = serial.serial_for_url('HWGREP://test', do_not_open=True)
+        assert port.port == '/dev/test'
+
