@@ -186,6 +186,8 @@ class Serial(SerialBase):
 
     @property
     def in_waiting(self):
+        if not self.is_open:
+            raise PortNotOpenError()
         return self._read_buffer.qsize()
 
     def reset_input_buffer(self):

@@ -38,3 +38,10 @@ def test_cp2110_failed_open_releases_handle(backend):
     assert port._hid_handle is None
     port.close()
 
+
+
+def test_cp2110_closed_input_count(backend):
+    port = backend.Serial()
+    with pytest.raises(serial.PortNotOpenError):
+        _ = port.in_waiting
+
