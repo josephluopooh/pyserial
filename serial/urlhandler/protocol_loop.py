@@ -266,6 +266,8 @@ class Serial(SerialBase):
     @property
     def dsr(self):
         """Read terminal status line: Data Set Ready"""
+        if not self.is_open:
+            raise PortNotOpenError()
         if self.logger:
             self.logger.info('DSR -> state of DTR ({!r})'.format(self._dtr_state))
         return self._dtr_state

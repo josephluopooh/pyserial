@@ -17,3 +17,18 @@ def test_rs485_restores_rts_on_error(failure):
             port.write(b'data')
     assert port.rts is False
 
+
+
+def test_closed_loopback_dsr():
+    port = serial.serial_for_url('loop://', do_not_open=True)
+    with pytest.raises(serial.PortNotOpenError):
+        _ = port.dsr
+    port.open()
+    try:
+        port.dtr = False
+        assert port.dsr is False
+        port.dtr = True
+        assert port.dsr is True
+    finally:
+        port.close()
+
