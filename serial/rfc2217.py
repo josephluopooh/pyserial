@@ -404,13 +404,13 @@ class Serial(SerialBase):
         Open port with current settings. This may throw a SerialException
         if the port cannot be opened.
         """
-        self._ignore_set_control_answer = False
-        self._poll_modem_state = False
-        self._network_timeout = 3
         if self._port is None:
             raise SerialException("Port must be configured before it can be used.")
         if self.is_open:
             raise SerialException("Port is already open.")
+        self._ignore_set_control_answer = False
+        self._poll_modem_state = False
+        self._network_timeout = 3
         try:
             self._socket = socket.create_connection(self.from_url(self.name), timeout=5)  # XXX good value?
             self._socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)

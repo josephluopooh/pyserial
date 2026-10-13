@@ -154,3 +154,22 @@ def test_rfc2217_close_after_shutdown_error():
     sock.close.assert_called_once_with()
     assert port._socket is None
 
+
+
+def test_rfc2217_repeated_open_preserves_options():
+    from serial.rfc2217 import Serial
+    port = Serial()
+    port.port = 'rfc2217://localhost:1234'
+    port.is_open = True
+    port._network_timeout = 10
+    port._poll_modem_state = True
+    port._ignore_set_control_answer = True
+    try:
+        with pytest.raises(serial.SerialException):
+            port.open()
+        assert port._network_timeout == 10
+        assert port._poll_modem_state
+        assert port._ignore_set_control_answer
+    finally:
+        port.close()
+
