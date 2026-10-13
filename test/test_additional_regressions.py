@@ -124,3 +124,20 @@ def test_rfc2217_nonblocking_read_drains_queue():
         port._thread = None
         port.close()
 
+
+
+def test_rfc2217_typed_buffer_write_count():
+    import array
+    import threading
+    from serial.rfc2217 import Serial
+    port = Serial()
+    port.is_open = True
+    port._write_lock = threading.Lock()
+    port._socket = mock.Mock()
+    data = array.array('H', [1, 2])
+    try:
+        assert port.write(data) == memoryview(data).nbytes
+        port._socket.sendall.assert_called_once_with(data.tobytes())
+    finally:
+        port.close()
+

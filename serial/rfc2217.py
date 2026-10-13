@@ -634,9 +634,10 @@ class Serial(SerialBase):
         """
         if not self.is_open:
             raise PortNotOpenError()
+        data = to_bytes(data)
         with self._write_lock:
             try:
-                self._socket.sendall(to_bytes(data).replace(IAC, IAC_DOUBLED))
+                self._socket.sendall(data.replace(IAC, IAC_DOUBLED))
             except socket.error as e:
                 raise SerialException("connection failed (socket error): {}".format(e))
         return len(data)
