@@ -28,3 +28,13 @@ def test_alt_non_class():
     with pytest.raises(ValueError, match='not an instance of Serial'):
         protocol_alt.serial_class_for_url('alt:///dev/test?class=VERSION')
 
+
+
+def test_hexlify_empty_decoder_chunks():
+    assert hexlify_codec.hex_decode(b'') == ('', 0)
+    assert hexlify_codec.Codec().decode(b'') == ('', 0)
+    decoder = hexlify_codec.IncrementalDecoder()
+    assert decoder.decode(b'') == ''
+    assert decoder.decode(b'A') == '41 '
+    assert decoder.decode(b'', final=True) == ''
+

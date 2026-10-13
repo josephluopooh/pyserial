@@ -33,7 +33,7 @@ def hex_encode(data: str, errors: str = "strict") -> tuple[bytes, int]:
 
 def hex_decode(data: bytes | memoryview, errors: str = "strict") -> tuple[str, int]:
     """b'@AB' -> '40 41 42'"""
-    return data.hex(sep=" ").upper() + " ", len(data)
+    return (data.hex(sep=" ").upper() + " " if data else ""), len(data)
 
 
 class Codec(codecs.Codec):
@@ -43,7 +43,7 @@ class Codec(codecs.Codec):
 
     def decode(self, data: bytes, errors: str = "strict") -> tuple[str, int]:
         """b'@AB' -> '40 41 42'"""
-        return data.hex(sep=" ").upper() + " ", len(data)
+        return (data.hex(sep=" ").upper() + " " if data else ""), len(data)
 
 
 class IncrementalEncoder(codecs.IncrementalEncoder):
@@ -93,7 +93,7 @@ class IncrementalDecoder(codecs.IncrementalDecoder):
     """Incremental decoder"""
 
     def decode(self, data: bytes, final: bool = False):
-        return data.hex(sep=" ").upper() + " "
+        return (data.hex(sep=" ").upper() + " " if data else "")
 
 
 class StreamWriter(Codec, codecs.StreamWriter):
