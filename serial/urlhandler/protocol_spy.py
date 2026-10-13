@@ -201,9 +201,9 @@ class Serial(serial.Serial):
     # pylint: disable=no-member
 
     def __init__(self, *args, **kwargs):
-        super(Serial, self).__init__(*args, **kwargs)
         self.formatter = None
         self.show_all = False
+        super(Serial, self).__init__(*args, **kwargs)
 
     @serial.Serial.port.setter
     def port(self, value):

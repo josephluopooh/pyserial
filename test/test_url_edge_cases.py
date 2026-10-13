@@ -51,3 +51,11 @@ def test_hexlify_incomplete_final_pair():
     assert ignoring.encode('4', final=True) == b''
     assert ignoring.getstate() == 0
 
+
+
+def test_spy_direct_initialization():
+    with mock.patch.object(serial.Serial, 'open'):
+        port = protocol_spy.Serial('spy:///dev/test?all')
+    assert isinstance(port.formatter, protocol_spy.FormatHexdump)
+    assert port.show_all is True
+
