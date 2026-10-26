@@ -57,6 +57,10 @@ class ConsoleBase(object):
     def cleanup(self):
         """Restore default console settings"""
 
+    def close(self):
+        """Restore the console and release resources after use."""
+        self.cleanup()
+
     def getkey(self):
         """Read a single key from the console"""
         return None
@@ -190,20 +194,22 @@ if os.name == 'nt':  # noqa
 elif os.name == 'posix':
     import atexit
     import termios
-    import fcntl
+    import select
     import signal
+    import socket
 
     class Console(ConsoleBase):
         def __init__(self, miniterm):
             super(Console, self).__init__(miniterm)
             self.fd = sys.stdin.fileno()
             self.old = termios.tcgetattr(self.fd)
-            atexit.register(self.cleanup)
             signal.signal(signal.SIGINT, self.sigint)
-            if sys.version_info < (3, 0):
-                self.enc_stdin = codecs.getreader(sys.stdin.encoding)(sys.stdin)
-            else:
-                self.enc_stdin = sys.stdin
+            self._decoder = codecs.getincrementaldecoder(sys.stdin.encoding or 'utf-8')(
+                sys.stdin.errors or 'strict')
+            self._input_buffer = ''
+            self._cancel_reader, self._cancel_writer = socket.socketpair()
+            self._cancel_writer.setblocking(False)
+            atexit.register(self.close)
 
         def setup(self):
             new = termios.tcgetattr(self.fd)
@@ -213,16 +219,38 @@ elif os.name == 'posix':
             termios.tcsetattr(self.fd, termios.TCSANOW, new)
 
         def getkey(self):
-            c = self.enc_stdin.read(1)
+            # Read bytes without TextIOWrapper buffering: select cannot see
+            # characters that a buffered reader has already taken from the fd.
+            while not self._input_buffer:
+                ready, _, _ = select.select([self.fd, self._cancel_reader], [], [])
+                if self._cancel_reader in ready:
+                    self._cancel_reader.recv(4096)
+                    return '\0'
+                data = os.read(self.fd, 1)
+                self._input_buffer = self._decoder.decode(data, final=not data)
+                if not data and not self._input_buffer:
+                    return ''
+            c, self._input_buffer = self._input_buffer[0], self._input_buffer[1:]
             if c == unichr(0x7f):
                 c = unichr(8)    # map the BS key (which yields DEL) to backspace
             return c
 
         def cancel(self):
-            fcntl.ioctl(self.fd, termios.TIOCSTI, b'\0')
+            try:
+                self._cancel_writer.send(b'\0')
+            except BlockingIOError:
+                pass  # A cancellation is already waiting to be consumed.
 
         def cleanup(self):
             termios.tcsetattr(self.fd, termios.TCSAFLUSH, self.old)
+
+        def close(self):
+            try:
+                self.cleanup()
+            finally:
+                atexit.unregister(self.close)
+                self._cancel_reader.close()
+                self._cancel_writer.close()
 
         def sigint(self, sig, frame):
             """signal handler for a clean exit on SIGINT"""
@@ -457,7 +485,10 @@ class Miniterm(object):
             self.receiver_thread.join()
 
     def close(self):
-        self.serial.close()
+        try:
+            self.serial.close()
+        finally:
+            self.console.close()
 
     def update_transformations(self):
         """take list of transformation classes and instantiate them for rx and tx"""
