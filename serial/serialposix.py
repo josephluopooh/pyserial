@@ -623,6 +623,10 @@ class Serial(SerialBase, PlatformSpecific):
         while tx_len > 0:
             try:
                 n = os.write(self.fd, d)
+                if n == len(d):
+                    # All remaining bytes were accepted. A timeout expiring
+                    # after the write must not turn success into an error.
+                    return length
                 if timeout.is_non_blocking:
                     # Zero timeout indicates non-blocking - simply return the
                     # number of bytes of data actually written
